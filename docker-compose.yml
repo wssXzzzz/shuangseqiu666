@@ -1,0 +1,11 @@
+services:
+  ssq:
+    build: .
+    container_name: ssq-predictor
+    ports:
+      - "6888:5000"
+    volumes:
+      - ./data:/app/data
+    environment:
+      - TZ=Asia/Shanghai
+    restart: always
