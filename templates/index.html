@@ -2,321 +2,312 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>双色球智能预测系统</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>tailwind.config = { darkMode: 'class' }</script>
     <script src="https://cdn.jsdelivr.net/npm/echarts@5/dist/echarts.min.js"></script>
-    <style>
-        :root {
-            --ball-shadow-red: 0 2px 8px rgba(220,38,38,0.25);
-            --ball-shadow-blue: 0 2px 8px rgba(37,99,235,0.25);
-        }
-        .dark {
-            --ball-shadow-red: 0 2px 6px rgba(239,68,68,0.4);
-            --ball-shadow-blue: 0 2px 6px rgba(59,130,246,0.4);
-        }
-        .ball-red {
-            width: 44px; height: 44px; border-radius: 50%;
-            background: linear-gradient(135deg, #ef4444, #dc2626);
-            color: white; display: inline-flex; align-items: center; justify-content: center;
-            font-weight: bold; font-size: 18px; margin: 3px; box-shadow: var(--ball-shadow-red);
-        }
-        .ball-blue {
-            width: 44px; height: 44px; border-radius: 50%;
-            background: linear-gradient(135deg, #3b82f6, #2563eb);
-            color: white; display: inline-flex; align-items: center; justify-content: center;
-            font-weight: bold; font-size: 18px; margin: 3px; box-shadow: var(--ball-shadow-blue);
-        }
-        .ball-red-sm {
-            width: 32px; height: 32px; border-radius: 50%;
-            background: linear-gradient(135deg, #ef4444, #dc2626);
-            color: white; display: inline-flex; align-items: center; justify-content: center;
-            font-weight: 600; font-size: 13px; margin: 2px;
-            box-shadow: var(--ball-shadow-red);
-        }
-        .ball-blue-sm {
-            width: 32px; height: 32px; border-radius: 50%;
-            background: linear-gradient(135deg, #3b82f6, #2563eb);
-            color: white; display: inline-flex; align-items: center; justify-content: center;
-            font-weight: 600; font-size: 13px; margin: 2px;
-            box-shadow: var(--ball-shadow-blue);
-        }
-        .fade-in { animation: fadeIn 0.5s ease-in; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-    </style>
+    <!-- 防闪烁：首帧前先定主题 -->
     <script>
     (function(){
-        var t = localStorage.getItem('theme') || 'auto';
-        var dark = t === 'auto' ? window.matchMedia('(prefers-color-scheme: dark)').matches : t === 'dark';
-        if (dark) document.documentElement.classList.add('dark');
+      try{
+        var m = localStorage.getItem('sc-theme') || 'auto';
+        var dark = m === 'dark' || (m === 'auto' && matchMedia('(prefers-color-scheme: dark)').matches);
+        document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light');
+      }catch(e){}
     })();
     </script>
-</head>
-<body class="bg-slate-50 dark:bg-gray-950 text-slate-800 dark:text-gray-100 min-h-screen">
+    <style>
+    /* ===================== iOS 26 液态玻璃 设计令牌 ===================== */
+    :root[data-theme="light"]{
+      --page-bg:#e9ecf5;
+      --ambient:linear-gradient(165deg,#eef1fb 0%,#e7e9f4 50%,#f1eef8 100%);
+      --blob-red:rgba(255,86,86,.42); --blob-blue:rgba(64,120,255,.40); --blob-violet:rgba(168,110,255,.34);
+      --glass-bg:linear-gradient(150deg,rgba(255,255,255,.62),rgba(255,255,255,.34));
+      --glass-bg-strong:linear-gradient(150deg,rgba(255,255,255,.64),rgba(255,255,255,.36));
+      --glass-border:rgba(255,255,255,.65); --glass-hi:rgba(255,255,255,.85);
+      --glass-shadow:0 18px 40px -14px rgba(40,40,90,.28); --glass-shadow-sm:0 14px 34px -16px rgba(40,40,90,.24);
+      --text-1:#15151f; --text-2:rgba(60,60,90,.6); --text-3:rgba(60,60,90,.45); --text-strong-2:#2c2c3a;
+      --hairline:rgba(120,130,170,.12); --chip:rgba(120,130,180,.12); --chip-2:rgba(120,130,180,.14);
+      --accent:#2f63e0; --accent-soft-bg:rgba(120,140,255,.16);
+      --tab-bar-bg:linear-gradient(150deg,rgba(255,255,255,.72),rgba(255,255,255,.5)); --tab-bar-border:rgba(255,255,255,.7);
+      --tab-active-bg:linear-gradient(150deg,rgba(120,150,255,.22),rgba(120,150,255,.10));
+      --field-bg:rgba(255,255,255,.45);
+      --ball-red-idle-text:#d8392f; --ball-red-idle-border:rgba(239,68,68,.34);
+      --ball-blue-idle-text:#2f63e0; --ball-blue-idle-border:rgba(59,130,246,.34);
+      --toggle-off:rgba(120,130,170,.35); --toggle-on:#2f63e0;
+    }
+    :root[data-theme="dark"]{
+      --page-bg:#0a0b12;
+      --ambient:linear-gradient(165deg,#0c0e16 0%,#0a0b12 50%,#110c1a 100%);
+      --blob-red:rgba(255,72,72,.30); --blob-blue:rgba(60,120,255,.30); --blob-violet:rgba(150,90,255,.28);
+      --glass-bg:linear-gradient(150deg,rgba(255,255,255,.10),rgba(255,255,255,.035));
+      --glass-bg-strong:linear-gradient(150deg,rgba(255,255,255,.13),rgba(255,255,255,.05));
+      --glass-border:rgba(255,255,255,.15); --glass-hi:rgba(255,255,255,.20);
+      --glass-shadow:0 20px 46px -14px rgba(0,0,0,.66); --glass-shadow-sm:0 16px 38px -16px rgba(0,0,0,.56);
+      --text-1:#f3f4fb; --text-2:rgba(228,231,248,.64); --text-3:rgba(214,218,238,.44); --text-strong-2:#e9ebf5;
+      --hairline:rgba(255,255,255,.08); --chip:rgba(255,255,255,.07); --chip-2:rgba(255,255,255,.10);
+      --accent:#82a6ff; --accent-soft-bg:rgba(120,150,255,.20);
+      --tab-bar-bg:linear-gradient(150deg,rgba(48,52,70,.74),rgba(32,35,50,.54)); --tab-bar-border:rgba(255,255,255,.16);
+      --tab-active-bg:linear-gradient(150deg,rgba(120,150,255,.32),rgba(120,150,255,.12));
+      --field-bg:rgba(255,255,255,.06);
+      --ball-red-idle-text:#ff8f8f; --ball-red-idle-border:rgba(255,120,120,.42);
+      --ball-blue-idle-text:#9ec2ff; --ball-blue-idle-border:rgba(130,170,255,.42);
+      --toggle-off:rgba(255,255,255,.20); --toggle-on:#4d7dff;
+    }
+    *{box-sizing:border-box;-webkit-font-smoothing:antialiased;}
+    html,body{margin:0;padding:0;}
+    body{font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","SF Pro Text","PingFang SC","Helvetica Neue",system-ui,sans-serif;
+      background:var(--page-bg);color:var(--text-1);transition:background .4s ease;min-height:100vh;}
+    @keyframes scFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-18px)}}
+    @keyframes scRise{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+    @keyframes scPop{0%{transform:scale(.4);opacity:0}60%{transform:scale(1.08)}100%{transform:scale(1);opacity:1}}
+    ::-webkit-scrollbar{width:0;height:0;}
 
-<div class="max-w-6xl mx-auto px-4 py-6">
-    <!-- Header -->
-    <div class="text-center mb-8 fade-in">
-        <h1 class="text-3xl font-bold bg-gradient-to-r from-red-500 to-blue-600 dark:from-red-400 dark:to-blue-400 bg-clip-text text-transparent">
-            双色球智能预测系统
-        </h1>
-        <p class="text-slate-500 dark:text-gray-500 mt-2 text-sm">已收录 {{ total }} 期历史数据 | 开奖日：每周二 / 四 / 日</p>
-        <p class="text-amber-500 dark:text-yellow-600 text-xs mt-1">仅供娱乐参考，彩票开奖为随机事件</p>
-        <div class="flex items-center justify-center gap-3 mt-3">
-            <a href="/my-picks" class="px-4 py-2 bg-blue-600 hover:bg-blue-500 rounded-lg text-sm font-medium transition text-white">我的自选号码</a>
-            <div class="flex rounded-lg bg-slate-200/80 dark:bg-gray-700/80 p-0.5 gap-0.5">
-                <button onclick="setTheme('light')" class="theme-btn px-2 py-1 rounded-md text-sm transition" data-mode="light" title="浅色模式">☀️</button>
-                <button onclick="setTheme('auto')" class="theme-btn px-2 py-1 rounded-md text-sm transition" data-mode="auto" title="跟随系统">💻</button>
-                <button onclick="setTheme('dark')" class="theme-btn px-2 py-1 rounded-md text-sm transition" data-mode="dark" title="深色模式">🌙</button>
-            </div>
-        </div>
+    /* 环境光背景 */
+    .sc-bg{position:fixed;inset:0;overflow:hidden;background:var(--ambient);transition:background .45s ease;z-index:0;}
+    .sc-bg b{position:absolute;border-radius:50%;display:block;}
+    .sc-bg .r{top:-120px;left:-80px;width:380px;height:380px;background:radial-gradient(circle,var(--blob-red),transparent 70%);filter:blur(28px);animation:scFloat 13s ease-in-out infinite;}
+    .sc-bg .b{top:-60px;right:-90px;width:360px;height:360px;background:radial-gradient(circle,var(--blob-blue),transparent 70%);filter:blur(28px);animation:scFloat 16s ease-in-out infinite reverse;}
+    .sc-bg .v{bottom:-120px;left:30%;width:420px;height:420px;background:radial-gradient(circle,var(--blob-violet),transparent 70%);filter:blur(34px);animation:scFloat 19s ease-in-out infinite;}
+
+    .wrap{position:relative;z-index:1;max-width:448px;margin:0 auto;min-height:100vh;padding:0 16px 132px;}
+
+    /* 玻璃卡片 */
+    .glass{background:var(--glass-bg);backdrop-filter:blur(30px) saturate(170%);-webkit-backdrop-filter:blur(30px) saturate(170%);
+      border:1px solid var(--glass-border);box-shadow:var(--glass-shadow-sm),inset 0 1px 0 var(--glass-hi);border-radius:28px;}
+    .glass-strong{background:var(--glass-bg-strong);backdrop-filter:blur(34px) saturate(180%);-webkit-backdrop-filter:blur(34px) saturate(180%);
+      border:1px solid var(--glass-border);box-shadow:var(--glass-shadow),inset 0 1px 0 var(--glass-hi);border-radius:30px;}
+
+    /* 大标题 */
+    .lt-eyebrow{font-size:13px;font-weight:600;letter-spacing:.4px;color:var(--text-3);margin-bottom:2px;}
+    .lt-title{margin:0;font-size:34px;font-weight:800;letter-spacing:-.6px;color:var(--text-1);}
+    .lt-sub{font-size:13.5px;color:var(--text-2);margin-top:5px;}
+
+    /* 球 */
+    .ball{border-radius:50%;display:inline-flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-variant-numeric:tabular-nums;}
+    .red-grad{background:radial-gradient(circle at 34% 28%,#ff9d9d,#ef4444 48%,#c01f1f);}
+    .blue-grad{background:radial-gradient(circle at 34% 28%,#9ec2ff,#3b82f6 48%,#1d4fc0);}
+    .B-red,.B-blue{width:44px;height:44px;font-size:18px;}
+    .B-red{box-shadow:0 6px 14px -2px rgba(220,38,38,.5),inset 0 -3px 5px rgba(120,0,0,.4),inset 0 2px 4px rgba(255,255,255,.55);}
+    .B-blue{box-shadow:0 6px 14px -2px rgba(37,99,235,.5),inset 0 -3px 5px rgba(0,30,110,.4),inset 0 2px 4px rgba(255,255,255,.55);}
+    .b-red,.b-blue{width:27px;height:27px;font-size:12px;}
+    .b-red{box-shadow:0 3px 7px -1px rgba(220,38,38,.45),inset 0 1px 2px rgba(255,255,255,.5);}
+    .b-blue{box-shadow:0 3px 7px -1px rgba(37,99,235,.45),inset 0 1px 2px rgba(255,255,255,.5);}
+    .plus{color:var(--text-3);font-weight:300;}
+
+    /* 遗漏热力 */
+    .heat{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;}
+    .mcell{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:7px 0;border-radius:14px;line-height:1.1;}
+    .mcell .n{font-size:13px;font-weight:700;font-variant-numeric:tabular-nums;}
+    .mcell .m{font-size:9.5px;opacity:.78;margin-top:1px;}
+    .mcell.hot{background:linear-gradient(150deg,#ff5a5a,#e02e2e);color:#fff;box-shadow:0 4px 10px -3px rgba(224,46,46,.5);}
+    .mcell.warm{background:linear-gradient(150deg,#ffa23e,#f5811a);color:#fff;box-shadow:0 4px 10px -3px rgba(245,129,26,.45);}
+    .mcell.mild{background:linear-gradient(150deg,#ffd25e,#f5b30a);color:#7a5600;}
+    .mcell.cold{background:var(--chip);color:var(--text-2);}
+
+    /* 开奖行 */
+    .row{display:flex;align-items:center;gap:10px;padding:9px 16px;border-top:1px solid var(--hairline);}
+    .row .meta{min-width:58px;}
+    .row .issue{font-size:12.5px;font-weight:700;color:var(--text-strong-2);font-variant-numeric:tabular-nums;}
+    .row .date{font-size:10px;color:var(--text-3);margin-top:1px;}
+    .row .balls{display:flex;align-items:center;gap:3px;flex-wrap:wrap;}
+
+    .card-head{display:flex;align-items:center;justify-content:space-between;padding:14px 16px 10px;}
+    .card-title{font-size:16px;font-weight:700;color:var(--text-1);}
+    .btn-soft{border:none;background:var(--accent-soft-bg);color:var(--accent);font-size:12.5px;font-weight:600;padding:6px 13px;border-radius:20px;cursor:pointer;text-decoration:none;display:inline-block;}
+
+    /* 顶部主题分段控件 */
+    .seg{position:fixed;top:0;left:50%;transform:translateX(-50%);z-index:22;width:calc(100% - 32px);max-width:448px;display:flex;justify-content:flex-end;padding-top:14px;pointer-events:none;}
+    .seg-box{pointer-events:auto;display:flex;gap:2px;padding:4px;border-radius:21px;background:var(--tab-bar-bg);backdrop-filter:blur(34px) saturate(185%);-webkit-backdrop-filter:blur(34px) saturate(185%);border:1px solid var(--tab-bar-border);box-shadow:var(--glass-shadow-sm),inset 0 1px 0 var(--glass-hi);}
+    .seg-btn{width:34px;height:30px;display:flex;align-items:center;justify-content:center;border:none;background:transparent;color:var(--text-3);border-radius:16px;cursor:pointer;transition:all .2s;}
+    .seg-btn.on{background:var(--tab-active-bg);color:var(--accent);}
+
+    /* 底部玻璃标签栏 */
+    .tabbar{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);z-index:20;width:calc(100% - 40px);max-width:408px;}
+    .tabbar .inner{display:flex;align-items:stretch;gap:6px;padding:7px;border-radius:30px;background:var(--tab-bar-bg);backdrop-filter:blur(40px) saturate(190%);-webkit-backdrop-filter:blur(40px) saturate(190%);border:1px solid var(--tab-bar-border);box-shadow:var(--glass-shadow),inset 0 1px 0 var(--glass-hi);}
+    .tab{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;flex:1;padding:8px 0 6px;border:none;background:transparent;cursor:pointer;font-size:10.5px;font-weight:600;color:var(--text-3);border-radius:23px;transition:all .25s;text-decoration:none;}
+    .tab.on{color:var(--accent);font-weight:700;background:var(--tab-active-bg);box-shadow:inset 0 1px 0 var(--glass-hi);}
+
+    .foot{text-align:center;font-size:11px;color:var(--text-3);padding:12px 0 4px;}
+    .grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px;}
+    .chart-card{border-radius:26px;padding:16px 12px 8px;}
+    .chart-card .h{font-size:12.5px;font-weight:600;color:var(--text-2);padding-left:4px;}
+    </style>
+</head>
+<body>
+<div class="sc-bg"><b class="r"></b><b class="b"></b><b class="v"></b></div>
+
+<!-- 主题切换 -->
+<div class="seg"><div class="seg-box">
+    <button class="seg-btn" data-mode="light" onclick="setTheme('light')" title="浅色">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.5v2M12 19.5v2M21.5 12h-2M4.5 12h-2M18.4 5.6l-1.4 1.4M7 17l-1.4 1.4M18.4 18.4 17 17M7 7 5.6 5.6"/></svg>
+    </button>
+    <button class="seg-btn" data-mode="auto" onclick="setTheme('auto')" title="跟随系统">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.9"><circle cx="12" cy="12" r="8.4"/><path d="M12 3.6a8.4 8.4 0 010 16.8z" fill="currentColor" stroke="none"/></svg>
+    </button>
+    <button class="seg-btn" data-mode="dark" onclick="setTheme('dark')" title="深色">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linejoin="round"><path d="M20.5 14.8A8.2 8.2 0 1 1 9.2 3.6 6.6 6.6 0 0 0 20.5 14.8z"/></svg>
+    </button>
+</div></div>
+
+<div class="wrap">
+    <!-- 大标题 -->
+    <div style="padding:64px 4px 18px;">
+        <div class="lt-eyebrow">智能预测 · 多维分析</div>
+        <h1 class="lt-title">双色球</h1>
+        <div class="lt-sub">已收录 {{ total }} 期 · 每周二 / 四 / 日开奖</div>
     </div>
 
-    <!-- Prediction Section -->
+    <!-- 预测 -->
     {% if prediction %}
-    <div class="bg-white dark:bg-gray-900 rounded-2xl p-6 mb-6 border border-slate-200 dark:border-gray-800 shadow-sm dark:shadow-none fade-in">
-        <div class="flex items-center justify-center mb-4">
-            <h2 class="text-xl font-semibold">
-                <span class="text-yellow-400 mr-2">★</span>
-                第 {{ prediction.issue }} 期预测
-            </h2>
+    <div class="glass-strong" style="overflow:hidden;padding:22px;margin-bottom:16px;">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;">
+            <div style="display:flex;align-items:center;gap:8px;">
+                <span style="display:inline-flex;align-items:center;justify-content:center;width:26px;height:26px;border-radius:9px;background:linear-gradient(135deg,#ffd25e,#ff9d2e);box-shadow:0 4px 10px rgba(255,160,40,.45);color:#fff;font-size:14px;">✦</span>
+                <span style="font-size:17px;font-weight:700;color:var(--text-1);">智能预测</span>
+            </div>
+            <span style="font-size:12.5px;font-weight:600;color:var(--text-3);font-variant-numeric:tabular-nums;">第 {{ prediction.issue }} 期</span>
         </div>
-        <div class="flex items-center justify-center flex-wrap py-4">
+        <div style="display:flex;align-items:center;justify-content:center;gap:7px;flex-wrap:wrap;padding:18px 0 10px;">
             {% for i in range(6) %}
-            <div class="ball-red">{{ prediction['red' ~ (i+1)]|string }}</div>
+            <div class="ball red-grad B-red">{{ '%02d' % prediction['red' ~ (i+1)] }}</div>
             {% endfor %}
-            <div class="mx-2 text-slate-400 dark:text-gray-600 text-2xl">+</div>
-            <div class="ball-blue">{{ prediction.blue|string }}</div>
+            <span class="plus" style="font-size:22px;margin:0 2px;">+</span>
+            <div class="ball blue-grad B-blue">{{ '%02d' % prediction.blue }}</div>
         </div>
-        <p class="text-center text-slate-400 dark:text-gray-600 text-xs mt-2">基于频率分析 / 遗漏值 / 区间分布 / 奇偶比 / 和值等多维度综合加权</p>
+        <div style="text-align:center;font-size:11.5px;color:var(--text-3);margin-top:6px;">频率 · 遗漏 · 区间 · 奇偶 · 和值 多维加权</div>
     </div>
     {% endif %}
 
-    <!-- Charts -->
+    <!-- 图表 -->
     {% if analysis and analysis.frequency %}
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-6">
-        <div class="bg-white dark:bg-gray-900 rounded-2xl p-4 border border-slate-200 dark:border-gray-800 shadow-sm dark:shadow-none">
-            <h3 class="text-sm font-medium text-slate-500 dark:text-gray-400 mb-3">红球出现频率 TOP 33</h3>
-            <div id="chart-red" style="height: 300px;"></div>
-        </div>
-        <div class="bg-white dark:bg-gray-900 rounded-2xl p-4 border border-slate-200 dark:border-gray-800 shadow-sm dark:shadow-none">
-            <h3 class="text-sm font-medium text-slate-500 dark:text-gray-400 mb-3">蓝球出现频率 TOP 16</h3>
-            <div id="chart-blue" style="height: 300px;"></div>
-        </div>
+    <div class="grid2">
+        <div class="glass chart-card"><div class="h">红球频率</div><div id="chartRed" style="height:150px;width:100%;"></div></div>
+        <div class="glass chart-card"><div class="h">蓝球频率</div><div id="chartBlue" style="height:150px;width:100%;"></div></div>
+    </div>
+    <div class="grid2">
+        <div class="glass chart-card"><div class="h">三区间分布</div><div id="chartZone" style="height:150px;width:100%;"></div></div>
+        <div class="glass chart-card"><div class="h">和值走势</div><div id="chartSum" style="height:150px;width:100%;"></div></div>
     </div>
 
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-6">
-        <div class="bg-white dark:bg-gray-900 rounded-2xl p-4 border border-slate-200 dark:border-gray-800 shadow-sm dark:shadow-none">
-            <h3 class="text-sm font-medium text-slate-500 dark:text-gray-400 mb-3">区间分布</h3>
-            <div id="chart-zone" style="height: 260px;"></div>
-        </div>
-        <div class="bg-white dark:bg-gray-900 rounded-2xl p-4 border border-slate-200 dark:border-gray-800 shadow-sm dark:shadow-none">
-            <h3 class="text-sm font-medium text-slate-500 dark:text-gray-400 mb-3">近 30 期和值走势</h3>
-            <div id="chart-sum" style="height: 260px;"></div>
-        </div>
-    </div>
-
-    <!-- Analysis Summary -->
+    <!-- 遗漏热力 -->
     {% if analysis.missing %}
-    <div class="bg-white dark:bg-gray-900 rounded-2xl p-4 mb-6 border border-slate-200 dark:border-gray-800 shadow-sm dark:shadow-none">
-        <h3 class="text-sm font-medium text-slate-500 dark:text-gray-400 mb-3">红球遗漏值热力图</h3>
-        <div class="flex flex-wrap gap-2 justify-center">
+    <div class="glass" style="padding:18px 16px;margin-bottom:16px;">
+        <div style="font-size:13px;font-weight:600;color:var(--text-2);margin-bottom:12px;">红球遗漏热力</div>
+        <div class="heat">
             {% for i in range(1, 34) %}
             {% set miss = analysis.missing.red_missing.get(i|string, 0) %}
-            {% if miss >= 10 %}
-                <span class="w-12 text-center py-1 rounded text-xs font-bold bg-red-600 dark:bg-red-700 text-white">{{ '%02d' % i }}<br><span class="text-[10px] opacity-70">{{ miss }}期</span></span>
-            {% elif miss >= 5 %}
-                <span class="w-12 text-center py-1 rounded text-xs font-bold bg-orange-500 dark:bg-orange-600 text-white">{{ '%02d' % i }}<br><span class="text-[10px] opacity-70">{{ miss }}期</span></span>
-            {% elif miss >= 2 %}
-                <span class="w-12 text-center py-1 rounded text-xs font-bold bg-amber-400 dark:bg-yellow-600 text-white">{{ '%02d' % i }}<br><span class="text-[10px] opacity-70">{{ miss }}期</span></span>
-            {% else %}
-                <span class="w-12 text-center py-1 rounded text-xs font-bold bg-slate-200 dark:bg-gray-700 text-slate-600 dark:text-gray-300">{{ '%02d' % i }}<br><span class="text-[10px] opacity-70">{{ miss }}期</span></span>
-            {% endif %}
+            <div class="mcell {% if miss >= 10 %}hot{% elif miss >= 5 %}warm{% elif miss >= 2 %}mild{% else %}cold{% endif %}">
+                <span class="n">{{ '%02d' % i }}</span><span class="m">{{ miss }}期</span>
+            </div>
             {% endfor %}
         </div>
     </div>
     {% endif %}
     {% endif %}
 
-    <!-- Recent Results -->
-    <div class="bg-white dark:bg-gray-900 rounded-2xl p-4 border border-slate-200 dark:border-gray-800 shadow-sm dark:shadow-none mb-6 fade-in">
-        <div class="flex items-center justify-between mb-4">
-            <h2 class="text-lg font-semibold">最近 30 期开奖记录</h2>
-            <a href="/history" class="text-blue-600 dark:text-blue-400 hover:text-blue-500 dark:hover:text-blue-300 text-sm">查看全部 →</a>
+    <!-- 最近开奖 -->
+    <div class="glass" style="padding:6px 4px 8px;margin-bottom:8px;">
+        <div class="card-head">
+            <span class="card-title">最近开奖</span>
+            <a href="/history" class="btn-soft">全部 ›</a>
         </div>
-        <div class="overflow-x-auto">
-            <table class="w-full text-sm">
-                <thead>
-                    <tr class="text-slate-600 dark:text-gray-500 border-b-2 border-slate-200 dark:border-gray-800">
-                        <th class="py-2 px-3 text-left">期号</th>
-                        <th class="py-2 px-3 text-left">日期</th>
-                        <th class="py-2 px-3 text-left">开奖号码</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for r in results %}
-                    <tr class="border-b border-slate-100 dark:border-gray-800/50 hover:bg-slate-50 dark:hover:bg-gray-800/30">
-                        <td class="py-2 px-3 text-slate-500 dark:text-gray-400 font-mono">{{ r.issue }}</td>
-                        <td class="py-2 px-3 text-slate-400 dark:text-gray-500">{{ r.date }}</td>
-                        <td class="py-2 px-3">
-                            <span class="ball-red-sm">{{ '%02d' % r.red1 }}</span>
-                            <span class="ball-red-sm">{{ '%02d' % r.red2 }}</span>
-                            <span class="ball-red-sm">{{ '%02d' % r.red3 }}</span>
-                            <span class="ball-red-sm">{{ '%02d' % r.red4 }}</span>
-                            <span class="ball-red-sm">{{ '%02d' % r.red5 }}</span>
-                            <span class="ball-red-sm">{{ '%02d' % r.red6 }}</span>
-                            <span class="text-slate-400 dark:text-gray-600 mx-1">+</span>
-                            <span class="ball-blue-sm">{{ '%02d' % r.blue }}</span>
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+        {% for r in results %}
+        <div class="row">
+            <div class="meta"><div class="issue">{{ r.issue }}</div><div class="date">{{ r.date }}</div></div>
+            <div class="balls">
+                {% for i in range(6) %}<span class="ball red-grad b-red">{{ '%02d' % r['red' ~ (i+1)] }}</span>{% endfor %}
+                <span class="plus" style="font-size:13px;margin:0 1px;">+</span>
+                <span class="ball blue-grad b-blue">{{ '%02d' % r.blue }}</span>
+            </div>
         </div>
+        {% endfor %}
     </div>
-
-    <p class="text-center text-slate-400 dark:text-gray-700 text-xs pb-4">双色球智能预测系统 | 仅供娱乐参考 | 数据来源：中国福利彩票</p>
+    <div class="foot">仅供娱乐参考 · 开奖为随机事件 · 数据来源：中国福利彩票</div>
 </div>
 
+<!-- 底部标签栏 -->
+<div class="tabbar"><div class="inner">
+    <a href="/" class="tab on">
+        <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-8 9 8"/><path d="M5 9.5V20h14V9.5"/></svg><span>首页</span>
+    </a>
+    <a href="/history" class="tab">
+        <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3.2 2"/></svg><span>历史</span>
+    </a>
+    <a href="/my-picks" class="tab">
+        <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="8" r="2.3"/><circle cx="16" cy="8" r="2.3"/><circle cx="8" cy="16" r="2.3"/><circle cx="16" cy="16" r="2.3"/></svg><span>自选</span>
+    </a>
+</div></div>
+
 <script>
-/* ---- Theme ---- */
-function isDark() { return document.documentElement.classList.contains('dark'); }
-
-function applyTheme() {
-    var t = localStorage.getItem('theme') || 'auto';
-    var dark = t === 'auto' ? window.matchMedia('(prefers-color-scheme: dark)').matches : t === 'dark';
-    document.documentElement.classList.toggle('dark', dark);
+/* ===== 主题 ===== */
+function scResolveDark(m){return m==='dark'||(m==='auto'&&matchMedia('(prefers-color-scheme: dark)').matches);}
+function scApply(){
+    var m = localStorage.getItem('sc-theme') || 'auto';
+    var d = scResolveDark(m);
+    document.documentElement.setAttribute('data-theme', d ? 'dark' : 'light');
+    document.querySelectorAll('.seg-btn').forEach(function(b){ b.classList.toggle('on', b.dataset.mode === m); });
+    if (window.scOnTheme) window.scOnTheme(d);
 }
-
-function updateThemeButtons() {
-    var t = localStorage.getItem('theme') || 'auto';
-    document.querySelectorAll('.theme-btn').forEach(function(btn) {
-        var active = btn.dataset.mode === t;
-        btn.classList.toggle('bg-white', active);
-        btn.classList.toggle('dark:bg-gray-600', active);
-        btn.classList.toggle('shadow-sm', active);
-    });
-}
-
-function setTheme(mode) {
-    localStorage.setItem('theme', mode);
-    applyTheme();
-    updateThemeButtons();
-    renderCharts();
-}
-
-window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function() {
-    if ((localStorage.getItem('theme') || 'auto') === 'auto') {
-        applyTheme();
-        updateThemeButtons();
-        renderCharts();
-    }
+function setTheme(m){ try{localStorage.setItem('sc-theme', m);}catch(e){} scApply(); }
+matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function(){
+    if ((localStorage.getItem('sc-theme')||'auto')==='auto') scApply();
 });
+document.addEventListener('DOMContentLoaded', scApply);
 
-updateThemeButtons();
-
-/* ---- Charts ---- */
-function themeColors() {
-    var dark = isDark();
-    return {
-        axisLabel: dark ? '#9ca3af' : '#64748b',
-        splitLine: dark ? '#1f2937' : '#e2e8f0',
-        tooltipBg: dark ? '#1f2937' : '#ffffff',
-        tooltipBorder: dark ? '#374151' : '#e2e8f0',
-        tooltipText: dark ? '#e5e7eb' : '#334155',
-        tooltipShadow: dark ? '' : 'box-shadow: 0 4px 12px rgba(0,0,0,0.1)',
-        redGradEnd: dark ? '#991b1b' : '#fca5a5',
-        blueGradEnd: dark ? '#1e3a8a' : '#93c5fd',
-        pieLabel: dark ? '#9ca3af' : '#475569',
-        pieShadow: dark ? 'rgba(0,0,0,0.5)' : 'rgba(0,0,0,0.15)',
-        areaOpacity: dark ? 0.3 : 0.2
-    };
-}
-
-var redFreq = {{ (analysis.get('frequency', {}).get('red_freq', {})) | tojson }};
+/* ===== 图表 ===== */
+var redFreq  = {{ (analysis.get('frequency', {}).get('red_freq', {})) | tojson }};
 var blueFreq = {{ (analysis.get('frequency', {}).get('blue_freq', {})) | tojson }};
-var zones = {{ (analysis.get('zones', {})) | tojson }};
-var sums = {{ (analysis.get('sums', {}).get('sums', [])) | tojson }};
+var zones    = {{ (analysis.get('zones', {})) | tojson }};
+var sums     = {{ (analysis.get('sums', {}).get('sums', [])) | tojson }};
 var redChart, blueChart, zoneChart, sumChart;
 
-function renderCharts() {
-    var c = themeColors();
+function renderCharts(dark){
+    if (typeof echarts === 'undefined') return;
+    var axis = dark ? 'rgba(205,210,235,.5)' : 'rgba(70,70,110,.45)';
+    var tipBg = dark ? 'rgba(30,33,48,.94)' : 'rgba(255,255,255,.92)';
+    var tipBorder = dark ? 'rgba(255,255,255,.12)' : 'rgba(255,255,255,.8)';
+    var tipText = dark ? '#e9ebf5' : '#33334d';
+    var tooltip = {trigger:'axis',backgroundColor:tipBg,borderColor:tipBorder,textStyle:{color:tipText,fontSize:11},extraCssText:'border-radius:12px;box-shadow:0 8px 24px rgba(0,0,0,.25);'};
 
-    if (redFreq && Object.keys(redFreq).length > 0) {
-        if (!redChart) redChart = echarts.init(document.getElementById('chart-red'));
-        var redLabels = Object.keys(redFreq).sort(function(a,b){return +a - +b});
-        var redValues = redLabels.map(function(k){return redFreq[k]});
-        redChart.setOption({
-            backgroundColor: 'transparent',
-            grid: {top: 10, bottom: 30, left: 40, right: 10},
-            xAxis: {type: 'category', data: redLabels, axisLabel: {color: c.axisLabel, fontSize: 10}},
-            yAxis: {type: 'value', axisLabel: {color: c.axisLabel}, splitLine: {lineStyle: {color: c.splitLine}}},
-            series: [{type: 'bar', data: redValues,
-                itemStyle: {color: new echarts.graphic.LinearGradient(0,0,0,1,[{offset:0,color:'#ef4444'},{offset:1,color:c.redGradEnd}])},
-                barWidth: '60%'}],
-            tooltip: {trigger: 'axis', backgroundColor: c.tooltipBg, borderColor: c.tooltipBorder, textStyle: {color: c.tooltipText, fontSize: 12}, extraCssText: c.tooltipShadow}
-        }, true);
+    if (redFreq && Object.keys(redFreq).length){
+        if(!redChart) redChart = echarts.init(document.getElementById('chartRed'));
+        var rl = Object.keys(redFreq).sort(function(a,b){return +a-+b;});
+        redChart.setOption({backgroundColor:'transparent',grid:{top:8,bottom:22,left:6,right:6},
+            xAxis:{type:'category',data:rl,axisLabel:{color:axis,fontSize:8,interval:4},axisLine:{show:false},axisTick:{show:false}},
+            yAxis:{type:'value',show:false},tooltip:tooltip,
+            series:[{type:'bar',data:rl.map(function(k){return redFreq[k];}),barWidth:'58%',itemStyle:{borderRadius:[3,3,0,0],color:new echarts.graphic.LinearGradient(0,0,0,1,[{offset:0,color:'#ff5a5a'},{offset:1,color:dark?'#a83b3b':'#ffb0b0'}])}}]},true);
     }
-
-    if (blueFreq && Object.keys(blueFreq).length > 0) {
-        if (!blueChart) blueChart = echarts.init(document.getElementById('chart-blue'));
-        var blueLabels = Object.keys(blueFreq).sort(function(a,b){return +a - +b});
-        var blueValues = blueLabels.map(function(k){return blueFreq[k]});
-        blueChart.setOption({
-            backgroundColor: 'transparent',
-            grid: {top: 10, bottom: 30, left: 40, right: 10},
-            xAxis: {type: 'category', data: blueLabels, axisLabel: {color: c.axisLabel, fontSize: 10}},
-            yAxis: {type: 'value', axisLabel: {color: c.axisLabel}, splitLine: {lineStyle: {color: c.splitLine}}},
-            series: [{type: 'bar', data: blueValues,
-                itemStyle: {color: new echarts.graphic.LinearGradient(0,0,0,1,[{offset:0,color:'#3b82f6'},{offset:1,color:c.blueGradEnd}])},
-                barWidth: '60%'}],
-            tooltip: {trigger: 'axis', backgroundColor: c.tooltipBg, borderColor: c.tooltipBorder, textStyle: {color: c.tooltipText, fontSize: 12}, extraCssText: c.tooltipShadow}
-        }, true);
+    if (blueFreq && Object.keys(blueFreq).length){
+        if(!blueChart) blueChart = echarts.init(document.getElementById('chartBlue'));
+        var bl = Object.keys(blueFreq).sort(function(a,b){return +a-+b;});
+        blueChart.setOption({backgroundColor:'transparent',grid:{top:8,bottom:22,left:6,right:6},
+            xAxis:{type:'category',data:bl,axisLabel:{color:axis,fontSize:8,interval:1},axisLine:{show:false},axisTick:{show:false}},
+            yAxis:{type:'value',show:false},tooltip:tooltip,
+            series:[{type:'bar',data:bl.map(function(k){return blueFreq[k];}),barWidth:'58%',itemStyle:{borderRadius:[3,3,0,0],color:new echarts.graphic.LinearGradient(0,0,0,1,[{offset:0,color:'#4d8bff'},{offset:1,color:dark?'#3357a8':'#a9c8ff'}])}}]},true);
     }
-
-    if (zones && Object.keys(zones).length > 0) {
-        if (!zoneChart) zoneChart = echarts.init(document.getElementById('chart-zone'));
-        zoneChart.setOption({
-            backgroundColor: 'transparent',
-            tooltip: {trigger: 'item', backgroundColor: c.tooltipBg, borderColor: c.tooltipBorder, textStyle: {color: c.tooltipText, fontSize: 12}, extraCssText: c.tooltipShadow},
-            series: [{type: 'pie', radius: ['40%', '70%'],
-                data: [
-                    {value: zones['1-11']||0, name: '1-11', itemStyle: {color: '#ef4444'}},
-                    {value: zones['12-22']||0, name: '12-22', itemStyle: {color: '#f59e0b'}},
-                    {value: zones['23-33']||0, name: '23-33', itemStyle: {color: '#3b82f6'}}
-                ],
-                label: {color: c.pieLabel},
-                emphasis: {itemStyle: {shadowBlur: 10, shadowColor: c.pieShadow}}}]
-        }, true);
+    if (zones && Object.keys(zones).length){
+        if(!zoneChart) zoneChart = echarts.init(document.getElementById('chartZone'));
+        zoneChart.setOption({backgroundColor:'transparent',
+            tooltip:{trigger:'item',backgroundColor:tipBg,borderColor:tipBorder,textStyle:{color:tipText,fontSize:11},extraCssText:'border-radius:12px;box-shadow:0 8px 24px rgba(0,0,0,.25);'},
+            series:[{type:'pie',radius:['52%','78%'],center:['50%','50%'],label:{show:true,fontSize:9,color:axis,formatter:'{b}'},labelLine:{length:4,length2:4},
+                itemStyle:{borderColor:dark?'rgba(18,20,30,.55)':'rgba(255,255,255,.6)',borderWidth:2},
+                data:[{value:zones['1-11']||0,name:'1-11',itemStyle:{color:'#ef4444'}},{value:zones['12-22']||0,name:'12-22',itemStyle:{color:'#f59e0b'}},{value:zones['23-33']||0,name:'23-33',itemStyle:{color:'#3b82f6'}}]}]},true);
     }
-
-    if (sums && sums.length > 0) {
-        if (!sumChart) sumChart = echarts.init(document.getElementById('chart-sum'));
-        var sumLabels = sums.map(function(_, i){return i + 1});
-        sumChart.setOption({
-            backgroundColor: 'transparent',
-            grid: {top: 10, bottom: 30, left: 40, right: 10},
-            xAxis: {type: 'category', data: sumLabels, axisLabel: {color: c.axisLabel, fontSize: 10}},
-            yAxis: {type: 'value', axisLabel: {color: c.axisLabel}, splitLine: {lineStyle: {color: c.splitLine}}},
-            series: [{type: 'line', data: sums, smooth: true,
-                lineStyle: {color: '#10b981', width: 2},
-                areaStyle: {color: new echarts.graphic.LinearGradient(0,0,0,1,[{offset:0,color:'rgba(16,185,129,' + c.areaOpacity + ')'},{offset:1,color:'rgba(16,185,129,0)'}])},
-                symbol: 'none'}],
-            tooltip: {trigger: 'axis', backgroundColor: c.tooltipBg, borderColor: c.tooltipBorder, textStyle: {color: c.tooltipText, fontSize: 12}, extraCssText: c.tooltipShadow}
-        }, true);
+    if (sums && sums.length){
+        if(!sumChart) sumChart = echarts.init(document.getElementById('chartSum'));
+        sumChart.setOption({backgroundColor:'transparent',grid:{top:12,bottom:16,left:8,right:8},
+            xAxis:{type:'category',data:sums.map(function(_,i){return i+1;}),show:false},yAxis:{type:'value',scale:true,show:false},tooltip:tooltip,
+            series:[{type:'line',data:sums,smooth:true,symbol:'none',lineStyle:{color:'#16b187',width:2.4},
+                areaStyle:{color:new echarts.graphic.LinearGradient(0,0,0,1,[{offset:0,color:'rgba(22,177,135,.32)'},{offset:1,color:'rgba(22,177,135,0)'}])}}]},true);
     }
 }
-
-renderCharts();
-
+window.scOnTheme = function(dark){ renderCharts(dark); };
+document.addEventListener('DOMContentLoaded', function(){
+    renderCharts(document.documentElement.getAttribute('data-theme') === 'dark');
+});
 window.addEventListener('resize', function(){
-    if(redChart) redChart.resize();
-    if(blueChart) blueChart.resize();
-    if(zoneChart) zoneChart.resize();
-    if(sumChart) sumChart.resize();
+    [redChart,blueChart,zoneChart,sumChart].forEach(function(c){ if(c) c.resize(); });
 });
 </script>
-
 </body>
 </html>

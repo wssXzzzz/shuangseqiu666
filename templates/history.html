@@ -2,136 +2,140 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>历史开奖记录 - 双色球智能预测系统</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>tailwind.config = { darkMode: 'class' }</script>
-    <style>
-        .ball-red-sm {
-            width: 32px; height: 32px; border-radius: 50%;
-            background: linear-gradient(135deg, #ef4444, #dc2626);
-            color: white; display: inline-flex; align-items: center; justify-content: center;
-            font-weight: 600; font-size: 13px; margin: 2px;
-            box-shadow: var(--ball-shadow-red);
-        }
-        .ball-blue-sm {
-            width: 32px; height: 32px; border-radius: 50%;
-            background: linear-gradient(135deg, #3b82f6, #2563eb);
-            color: white; display: inline-flex; align-items: center; justify-content: center;
-            font-weight: 600; font-size: 13px; margin: 2px;
-            box-shadow: var(--ball-shadow-blue);
-        }
-        :root { --ball-shadow-red: 0 2px 8px rgba(220,38,38,0.25); --ball-shadow-blue: 0 2px 8px rgba(37,99,235,0.25); }
-        .dark { --ball-shadow-red: 0 2px 6px rgba(239,68,68,0.4); --ball-shadow-blue: 0 2px 6px rgba(59,130,246,0.4); }
-    </style>
     <script>
     (function(){
-        var t = localStorage.getItem('theme') || 'auto';
-        var dark = t === 'auto' ? window.matchMedia('(prefers-color-scheme: dark)').matches : t === 'dark';
-        if (dark) document.documentElement.classList.add('dark');
+      try{
+        var m = localStorage.getItem('sc-theme') || 'auto';
+        var dark = m === 'dark' || (m === 'auto' && matchMedia('(prefers-color-scheme: dark)').matches);
+        document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light');
+      }catch(e){}
     })();
     </script>
+    <style>
+    :root[data-theme="light"]{
+      --page-bg:#e9ecf5;
+      --ambient:linear-gradient(165deg,#eef1fb 0%,#e7e9f4 50%,#f1eef8 100%);
+      --blob-red:rgba(255,86,86,.42); --blob-blue:rgba(64,120,255,.40); --blob-violet:rgba(168,110,255,.34);
+      --glass-bg:linear-gradient(150deg,rgba(255,255,255,.62),rgba(255,255,255,.34));
+      --glass-border:rgba(255,255,255,.65); --glass-hi:rgba(255,255,255,.85);
+      --glass-shadow:0 18px 40px -14px rgba(40,40,90,.28); --glass-shadow-sm:0 14px 34px -16px rgba(40,40,90,.24);
+      --text-1:#15151f; --text-2:rgba(60,60,90,.6); --text-3:rgba(60,60,90,.45); --text-strong-2:#2c2c3a;
+      --hairline:rgba(120,130,170,.12); --chip:rgba(120,130,180,.12);
+      --accent:#2f63e0; --accent-soft-bg:rgba(120,140,255,.16);
+      --tab-bar-bg:linear-gradient(150deg,rgba(255,255,255,.72),rgba(255,255,255,.5)); --tab-bar-border:rgba(255,255,255,.7);
+      --tab-active-bg:linear-gradient(150deg,rgba(120,150,255,.22),rgba(120,150,255,.10));
+      --field-bg:rgba(255,255,255,.45);
+    }
+    :root[data-theme="dark"]{
+      --page-bg:#0a0b12;
+      --ambient:linear-gradient(165deg,#0c0e16 0%,#0a0b12 50%,#110c1a 100%);
+      --blob-red:rgba(255,72,72,.30); --blob-blue:rgba(60,120,255,.30); --blob-violet:rgba(150,90,255,.28);
+      --glass-bg:linear-gradient(150deg,rgba(255,255,255,.10),rgba(255,255,255,.035));
+      --glass-border:rgba(255,255,255,.15); --glass-hi:rgba(255,255,255,.20);
+      --glass-shadow:0 20px 46px -14px rgba(0,0,0,.66); --glass-shadow-sm:0 16px 38px -16px rgba(0,0,0,.56);
+      --text-1:#f3f4fb; --text-2:rgba(228,231,248,.64); --text-3:rgba(214,218,238,.44); --text-strong-2:#e9ebf5;
+      --hairline:rgba(255,255,255,.08); --chip:rgba(255,255,255,.07);
+      --accent:#82a6ff; --accent-soft-bg:rgba(120,150,255,.20);
+      --tab-bar-bg:linear-gradient(150deg,rgba(48,52,70,.74),rgba(32,35,50,.54)); --tab-bar-border:rgba(255,255,255,.16);
+      --tab-active-bg:linear-gradient(150deg,rgba(120,150,255,.32),rgba(120,150,255,.12));
+      --field-bg:rgba(255,255,255,.06);
+    }
+    *{box-sizing:border-box;-webkit-font-smoothing:antialiased;}
+    html,body{margin:0;padding:0;}
+    body{font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","SF Pro Text","PingFang SC","Helvetica Neue",system-ui,sans-serif;
+      background:var(--page-bg);color:var(--text-1);transition:background .4s ease;min-height:100vh;}
+    @keyframes scFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-18px)}}
+    ::-webkit-scrollbar{width:0;height:0;}
+    .sc-bg{position:fixed;inset:0;overflow:hidden;background:var(--ambient);transition:background .45s ease;z-index:0;}
+    .sc-bg b{position:absolute;border-radius:50%;display:block;}
+    .sc-bg .r{top:-120px;left:-80px;width:380px;height:380px;background:radial-gradient(circle,var(--blob-red),transparent 70%);filter:blur(28px);animation:scFloat 13s ease-in-out infinite;}
+    .sc-bg .b{top:-60px;right:-90px;width:360px;height:360px;background:radial-gradient(circle,var(--blob-blue),transparent 70%);filter:blur(28px);animation:scFloat 16s ease-in-out infinite reverse;}
+    .sc-bg .v{bottom:-120px;left:30%;width:420px;height:420px;background:radial-gradient(circle,var(--blob-violet),transparent 70%);filter:blur(34px);animation:scFloat 19s ease-in-out infinite;}
+    .wrap{position:relative;z-index:1;max-width:448px;margin:0 auto;min-height:100vh;padding:0 16px 132px;}
+    .glass{background:var(--glass-bg);backdrop-filter:blur(30px) saturate(170%);-webkit-backdrop-filter:blur(30px) saturate(170%);border:1px solid var(--glass-border);box-shadow:var(--glass-shadow-sm),inset 0 1px 0 var(--glass-hi);border-radius:28px;}
+    .lt-eyebrow{font-size:13px;font-weight:600;letter-spacing:.4px;color:var(--text-3);margin-bottom:2px;}
+    .lt-title{margin:0;font-size:34px;font-weight:800;letter-spacing:-.6px;color:var(--text-1);}
+    .lt-sub{font-size:13.5px;color:var(--text-2);margin-top:5px;}
+    .ball{border-radius:50%;display:inline-flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-variant-numeric:tabular-nums;}
+    .red-grad{background:radial-gradient(circle at 34% 28%,#ff9d9d,#ef4444 48%,#c01f1f);}
+    .blue-grad{background:radial-gradient(circle at 34% 28%,#9ec2ff,#3b82f6 48%,#1d4fc0);}
+    .b-red,.b-blue{width:27px;height:27px;font-size:12px;}
+    .b-red{box-shadow:0 3px 7px -1px rgba(220,38,38,.45),inset 0 1px 2px rgba(255,255,255,.5);}
+    .b-blue{box-shadow:0 3px 7px -1px rgba(37,99,235,.45),inset 0 1px 2px rgba(255,255,255,.5);}
+    .plus{color:var(--text-3);font-weight:300;}
+    .row{display:flex;align-items:center;gap:10px;padding:11px 16px;border-top:1px solid var(--hairline);}
+    .row .meta{min-width:58px;}
+    .row .issue{font-size:12.5px;font-weight:700;color:var(--text-strong-2);font-variant-numeric:tabular-nums;}
+    .row .date{font-size:10px;color:var(--text-3);margin-top:1px;}
+    .row .balls{display:flex;align-items:center;gap:3px;flex-wrap:wrap;}
+    .seg{position:fixed;top:0;left:50%;transform:translateX(-50%);z-index:22;width:calc(100% - 32px);max-width:448px;display:flex;justify-content:flex-end;padding-top:14px;pointer-events:none;}
+    .seg-box{pointer-events:auto;display:flex;gap:2px;padding:4px;border-radius:21px;background:var(--tab-bar-bg);backdrop-filter:blur(34px) saturate(185%);-webkit-backdrop-filter:blur(34px) saturate(185%);border:1px solid var(--tab-bar-border);box-shadow:var(--glass-shadow-sm),inset 0 1px 0 var(--glass-hi);}
+    .seg-btn{width:34px;height:30px;display:flex;align-items:center;justify-content:center;border:none;background:transparent;color:var(--text-3);border-radius:16px;cursor:pointer;transition:all .2s;}
+    .seg-btn.on{background:var(--tab-active-bg);color:var(--accent);}
+    .tabbar{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);z-index:20;width:calc(100% - 40px);max-width:408px;}
+    .tabbar .inner{display:flex;align-items:stretch;gap:6px;padding:7px;border-radius:30px;background:var(--tab-bar-bg);backdrop-filter:blur(40px) saturate(190%);-webkit-backdrop-filter:blur(40px) saturate(190%);border:1px solid var(--tab-bar-border);box-shadow:var(--glass-shadow),inset 0 1px 0 var(--glass-hi);}
+    .tab{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;flex:1;padding:8px 0 6px;border:none;background:transparent;cursor:pointer;font-size:10.5px;font-weight:600;color:var(--text-3);border-radius:23px;transition:all .25s;text-decoration:none;}
+    .tab.on{color:var(--accent);font-weight:700;background:var(--tab-active-bg);box-shadow:inset 0 1px 0 var(--glass-hi);}
+    .pager{display:flex;align-items:center;justify-content:center;gap:10px;padding-bottom:8px;flex-wrap:wrap;}
+    .pbtn{border:1px solid var(--glass-border);padding:9px 16px;border-radius:20px;font-size:13px;font-weight:600;color:var(--text-strong-2);background:var(--field-bg);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);text-decoration:none;}
+    .pnow{font-size:13px;font-weight:700;color:var(--text-strong-2);min-width:54px;text-align:center;font-variant-numeric:tabular-nums;}
+    </style>
 </head>
-<body class="bg-slate-50 dark:bg-gray-950 text-slate-800 dark:text-gray-100 min-h-screen">
-<div class="max-w-5xl mx-auto px-4 py-6">
-    <div class="flex items-center justify-between mb-6">
-        <h1 class="text-2xl font-bold">历史开奖记录</h1>
-        <div class="flex items-center gap-3">
-            <div class="flex rounded-lg bg-slate-200/80 dark:bg-gray-700/80 p-0.5 gap-0.5">
-                <button onclick="setTheme('light')" class="theme-btn px-2 py-1 rounded-md text-sm transition" data-mode="light" title="浅色模式">☀️</button>
-                <button onclick="setTheme('auto')" class="theme-btn px-2 py-1 rounded-md text-sm transition" data-mode="auto" title="跟随系统">💻</button>
-                <button onclick="setTheme('dark')" class="theme-btn px-2 py-1 rounded-md text-sm transition" data-mode="dark" title="深色模式">🌙</button>
+<body>
+<div class="sc-bg"><b class="r"></b><b class="b"></b><b class="v"></b></div>
+
+<div class="seg"><div class="seg-box">
+    <button class="seg-btn" data-mode="light" onclick="setTheme('light')" title="浅色"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.5v2M12 19.5v2M21.5 12h-2M4.5 12h-2M18.4 5.6l-1.4 1.4M7 17l-1.4 1.4M18.4 18.4 17 17M7 7 5.6 5.6"/></svg></button>
+    <button class="seg-btn" data-mode="auto" onclick="setTheme('auto')" title="跟随系统"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.9"><circle cx="12" cy="12" r="8.4"/><path d="M12 3.6a8.4 8.4 0 010 16.8z" fill="currentColor" stroke="none"/></svg></button>
+    <button class="seg-btn" data-mode="dark" onclick="setTheme('dark')" title="深色"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linejoin="round"><path d="M20.5 14.8A8.2 8.2 0 1 1 9.2 3.6 6.6 6.6 0 0 0 20.5 14.8z"/></svg></button>
+</div></div>
+
+<div class="wrap">
+    <div style="padding:64px 4px 18px;">
+        <div class="lt-eyebrow">开奖档案</div>
+        <h1 class="lt-title">历史记录</h1>
+        <div class="lt-sub">共 {{ total }} 期 · 第 {{ page }} / {{ total_pages }} 页</div>
+    </div>
+
+    <div class="glass" style="padding:6px 4px 8px;margin-bottom:16px;">
+        {% for r in results %}
+        <div class="row">
+            <div class="meta"><div class="issue">{{ r.issue }}</div><div class="date">{{ r.date }}</div></div>
+            <div class="balls">
+                {% for i in range(6) %}<span class="ball red-grad b-red">{{ '%02d' % r['red' ~ (i+1)] }}</span>{% endfor %}
+                <span class="plus" style="font-size:13px;margin:0 1px;">+</span>
+                <span class="ball blue-grad b-blue">{{ '%02d' % r.blue }}</span>
             </div>
-            <a href="/" class="text-blue-600 dark:text-blue-400 hover:text-blue-500 dark:hover:text-blue-300 text-sm">← 返回首页</a>
         </div>
-    </div>
-    <p class="text-slate-500 dark:text-gray-500 text-sm mb-4">共 {{ total }} 期 | 第 {{ page }} / {{ total_pages }} 页</p>
-
-    <div class="bg-white dark:bg-gray-900 rounded-2xl border border-slate-200 dark:border-gray-800 shadow-sm dark:shadow-none overflow-hidden">
-        <div class="overflow-x-auto">
-            <table class="w-full text-sm">
-                <thead>
-                    <tr class="text-slate-600 dark:text-gray-500 border-b-2 border-slate-200 dark:border-gray-800 bg-slate-50 dark:bg-gray-900/80">
-                        <th class="py-3 px-4 text-left">期号</th>
-                        <th class="py-3 px-4 text-left">日期</th>
-                        <th class="py-3 px-4 text-left">开奖号码</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for r in results %}
-                    <tr class="border-b border-slate-100 dark:border-gray-800/50 hover:bg-slate-50 dark:hover:bg-gray-800/30">
-                        <td class="py-2 px-4 text-slate-500 dark:text-gray-400 font-mono">{{ r.issue }}</td>
-                        <td class="py-2 px-4 text-slate-400 dark:text-gray-500">{{ r.date }}</td>
-                        <td class="py-2 px-4">
-                            <span class="ball-red-sm">{{ '%02d' % r.red1 }}</span>
-                            <span class="ball-red-sm">{{ '%02d' % r.red2 }}</span>
-                            <span class="ball-red-sm">{{ '%02d' % r.red3 }}</span>
-                            <span class="ball-red-sm">{{ '%02d' % r.red4 }}</span>
-                            <span class="ball-red-sm">{{ '%02d' % r.red5 }}</span>
-                            <span class="ball-red-sm">{{ '%02d' % r.red6 }}</span>
-                            <span class="text-slate-400 dark:text-gray-600 mx-1">+</span>
-                            <span class="ball-blue-sm">{{ '%02d' % r.blue }}</span>
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
-    </div>
-
-    <!-- Pagination -->
-    <div class="flex justify-center gap-2 mt-6 flex-wrap">
-        {% if page > 1 %}
-        <a href="/history?page={{ page - 1 }}" class="px-3 py-2 bg-white dark:bg-gray-800 hover:bg-slate-50 dark:hover:bg-gray-700 border border-slate-200 dark:border-gray-700 rounded-lg text-sm">上一页</a>
-        {% endif %}
-
-        {% for p in range(1, total_pages + 1) %}
-            {% if p == page %}
-            <span class="px-3 py-2 bg-blue-600 rounded-lg text-sm font-medium text-white">{{ p }}</span>
-            {% elif p <= 3 or p > total_pages - 3 or (p >= page - 2 and p <= page + 2) %}
-            <a href="/history?page={{ p }}" class="px-3 py-2 bg-white dark:bg-gray-800 hover:bg-slate-50 dark:hover:bg-gray-700 border border-slate-200 dark:border-gray-700 rounded-lg text-sm">{{ p }}</a>
-            {% elif p == 4 or p == total_pages - 3 %}
-            <span class="px-3 py-2 text-slate-400 dark:text-gray-600">...</span>
-            {% endif %}
         {% endfor %}
+    </div>
 
-        {% if page < total_pages %}
-        <a href="/history?page={{ page + 1 }}" class="px-3 py-2 bg-white dark:bg-gray-800 hover:bg-slate-50 dark:hover:bg-gray-700 border border-slate-200 dark:border-gray-700 rounded-lg text-sm">下一页</a>
-        {% endif %}
+    <div class="pager">
+        {% if page > 1 %}<a href="/history?page={{ page - 1 }}" class="pbtn">‹ 上一页</a>{% endif %}
+        <span class="pnow">{{ page }} / {{ total_pages }}</span>
+        {% if page < total_pages %}<a href="/history?page={{ page + 1 }}" class="pbtn">下一页 ›</a>{% endif %}
     </div>
 </div>
 
+<div class="tabbar"><div class="inner">
+    <a href="/" class="tab"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-8 9 8"/><path d="M5 9.5V20h14V9.5"/></svg><span>首页</span></a>
+    <a href="/history" class="tab on"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3.2 2"/></svg><span>历史</span></a>
+    <a href="/my-picks" class="tab"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="8" r="2.3"/><circle cx="16" cy="8" r="2.3"/><circle cx="8" cy="16" r="2.3"/><circle cx="16" cy="16" r="2.3"/></svg><span>自选</span></a>
+</div></div>
+
 <script>
-function applyTheme() {
-    var t = localStorage.getItem('theme') || 'auto';
-    var dark = t === 'auto' ? window.matchMedia('(prefers-color-scheme: dark)').matches : t === 'dark';
-    document.documentElement.classList.toggle('dark', dark);
+function scResolveDark(m){return m==='dark'||(m==='auto'&&matchMedia('(prefers-color-scheme: dark)').matches);}
+function scApply(){
+    var m = localStorage.getItem('sc-theme') || 'auto';
+    var d = scResolveDark(m);
+    document.documentElement.setAttribute('data-theme', d ? 'dark' : 'light');
+    document.querySelectorAll('.seg-btn').forEach(function(b){ b.classList.toggle('on', b.dataset.mode === m); });
 }
-
-function updateThemeButtons() {
-    var t = localStorage.getItem('theme') || 'auto';
-    document.querySelectorAll('.theme-btn').forEach(function(btn) {
-        var active = btn.dataset.mode === t;
-        btn.classList.toggle('bg-white', active);
-        btn.classList.toggle('dark:bg-gray-600', active);
-        btn.classList.toggle('shadow-sm', active);
-    });
-}
-
-function setTheme(mode) {
-    localStorage.setItem('theme', mode);
-    applyTheme();
-    updateThemeButtons();
-}
-
-window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function() {
-    if ((localStorage.getItem('theme') || 'auto') === 'auto') {
-        applyTheme();
-        updateThemeButtons();
-    }
-});
-
-updateThemeButtons();
+function setTheme(m){ try{localStorage.setItem('sc-theme', m);}catch(e){} scApply(); }
+matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function(){ if((localStorage.getItem('sc-theme')||'auto')==='auto') scApply(); });
+document.addEventListener('DOMContentLoaded', scApply);
 </script>
 </body>
 </html>
