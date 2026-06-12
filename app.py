@@ -4,6 +4,7 @@ from apscheduler.schedulers.background import BackgroundScheduler
 from database import (
     init_db, get_recent_results, get_all_results, get_result_count,
     save_prediction, get_latest_prediction,
+    get_all_predictions, get_unchecked_predictions, update_prediction_result,
     save_pick, get_picks, get_normal_picks, get_persistent_picks,
     get_persistent_results, get_unchecked_picks, update_pick_result, delete_pick,
     get_latest_result, has_persistent_result, save_persistent_result,
@@ -85,6 +86,31 @@ def check_picks():
                                prize or '未中奖', matched_str, blue_match)
 
 
+def check_predictions():
+    """开奖后自动比对预测记录"""
+    unchecked = get_unchecked_predictions()
+    if not unchecked:
+        return
+    conn = get_conn()
+    for pred in unchecked:
+        row = conn.execute(
+            'SELECT * FROM results WHERE issue = ?', (pred['issue'],)
+        ).fetchone()
+        if not row:
+            continue
+        draw_reds = [row['red1'], row['red2'], row['red3'],
+                     row['red4'], row['red5'], row['red6']]
+        pred_reds = [pred['red1'], pred['red2'], pred['red3'],
+                     pred['red4'], pred['red5'], pred['red6']]
+        red_match = len(set(pred_reds) & set(draw_reds))
+        blue_match = 1 if pred['blue'] == row['blue'] else 0
+        prize = get_prize(red_match, blue_match)
+        matched = sorted(set(pred_reds) & set(draw_reds))
+        matched_str = ','.join(str(n) for n in matched)
+        update_prediction_result(pred['id'], prize or '未中奖', matched_str, blue_match)
+    conn.close()
+
+
 def load_data():
     global data_loaded
     try:
@@ -100,6 +126,7 @@ def scheduled_update():
         if new_data:
             do_predict()
             check_picks()
+            check_predictions()
     except Exception as e:
         print(f'定时更新失败: {e}')
 
@@ -154,6 +181,19 @@ def history():
                            total=total)
 
 
+@app.route('/predictions')
+def predictions():
+    page = request.args.get('page', 1, type=int)
+    per_page = 20
+    preds, total = get_all_predictions(page, per_page)
+    total_pages = (total + per_page - 1) // per_page
+    return render_template('predictions.html',
+                           predictions=preds,
+                           page=page,
+                           total_pages=total_pages,
+                           total=total)
+
+
 @app.route('/api/latest')
 def api_latest():
     results = get_recent_results(10)
@@ -165,6 +205,7 @@ def api_refresh():
     new_data = fetch_latest()
     if new_data:
         check_picks()
+        check_predictions()
     return jsonify({'code': 200, 'new_data': new_data})
 
 
@@ -223,6 +264,7 @@ if __name__ == '__main__':
     load_data()
     do_predict()
     check_picks()
+    check_predictions()
 
     # 每天北京时间 21:35 自动检查更新（周二/四/日开奖）
     scheduler.add_job(scheduled_update, 'cron', hour=21, minute=35,

@@ -57,6 +57,16 @@ def init_db():
         conn.execute('ALTER TABLE my_picks ADD COLUMN parent_id INTEGER DEFAULT NULL')
     except sqlite3.OperationalError:
         pass
+    # 迁移：为 predictions 表添加开奖对比字段
+    for col in [
+        'ALTER TABLE predictions ADD COLUMN matched_reds TEXT',
+        'ALTER TABLE predictions ADD COLUMN matched_blue INTEGER DEFAULT 0',
+        'ALTER TABLE predictions ADD COLUMN prize TEXT',
+    ]:
+        try:
+            conn.execute(col)
+        except sqlite3.OperationalError:
+            pass
     conn.commit()
     conn.close()
 
@@ -262,3 +272,34 @@ def delete_pick(pick_id):
     conn.execute('DELETE FROM my_picks WHERE id=?', (pick_id,))
     conn.commit()
     conn.close()
+
+
+def get_unchecked_predictions():
+    conn = get_conn()
+    rows = conn.execute(
+        'SELECT * FROM predictions WHERE prize IS NULL ORDER BY id'
+    ).fetchall()
+    conn.close()
+    return [dict(r) for r in rows]
+
+
+def update_prediction_result(prediction_id, prize, matched_reds, matched_blue):
+    conn = get_conn()
+    conn.execute(
+        'UPDATE predictions SET prize=?, matched_reds=?, matched_blue=? WHERE id=?',
+        (prize, matched_reds, matched_blue, prediction_id)
+    )
+    conn.commit()
+    conn.close()
+
+
+def get_all_predictions(page=1, per_page=20):
+    conn = get_conn()
+    offset = (page - 1) * per_page
+    rows = conn.execute(
+        'SELECT * FROM predictions ORDER BY id DESC LIMIT ? OFFSET ?',
+        (per_page, offset)
+    ).fetchall()
+    total = conn.execute('SELECT COUNT(*) as cnt FROM predictions').fetchone()['cnt']
+    conn.close()
+    return [dict(r) for r in rows], total
