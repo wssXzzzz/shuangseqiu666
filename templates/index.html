@@ -105,7 +105,7 @@
     .mcell.cold{background:var(--chip);color:var(--text-2);}
 
     /* 开奖行 */
-    .row{display:flex;align-items:center;gap:10px;padding:9px 16px;border-top:none;background-image:linear-gradient(90deg,transparent,var(--hairline) 30%,var(--hairline) 70%,transparent);background-size:100% 1px;background-repeat:no-repeat;background-position:top center;}
+    .row{display:flex;align-items:center;gap:10px;padding:9px 16px;border-top:1px solid var(--hairline);}
     .row .meta{min-width:58px;}
     .row .issue{font-size:12.5px;font-weight:700;color:var(--text-strong-2);font-variant-numeric:tabular-nums;}
     .row .date{font-size:10px;color:var(--text-3);margin-top:1px;}
@@ -165,8 +165,10 @@
                 <span style="display:inline-flex;align-items:center;justify-content:center;width:26px;height:26px;border-radius:9px;background:linear-gradient(135deg,#ffd25e,#ff9d2e);box-shadow:0 4px 10px rgba(255,160,40,.45);color:#fff;font-size:14px;">✦</span>
                 <span style="font-size:17px;font-weight:700;color:var(--text-1);">智能预测</span>
             </div>
-            <span style="font-size:12.5px;font-weight:600;color:var(--text-3);font-variant-numeric:tabular-nums;">第 {{ prediction.issue }} 期</span>
-                <a href="/predictions" style="font-size:11px;color:var(--accent);text-decoration:none;font-weight:600;">历史预测 ›</a>
+            <div style="display:flex;align-items:center;gap:9px;">
+                <span style="font-size:12.5px;font-weight:600;color:var(--text-3);font-variant-numeric:tabular-nums;">第 {{ prediction.issue }} 期</span>
+                <a href="/predictions" class="btn-soft">记录 ›</a>
+            </div>
         </div>
         <div style="display:flex;align-items:center;justify-content:center;gap:7px;flex-wrap:wrap;padding:18px 0 10px;">
             {% for i in range(6) %}

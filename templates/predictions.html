@@ -26,6 +26,8 @@
       --accent:#2f63e0; --accent-soft-bg:rgba(120,140,255,.16);
       --tab-bar-bg:linear-gradient(150deg,rgba(255,255,255,.72),rgba(255,255,255,.5)); --tab-bar-border:rgba(255,255,255,.7);
       --tab-active-bg:linear-gradient(150deg,rgba(120,150,255,.22),rgba(120,150,255,.10));
+      --field-bg:rgba(255,255,255,.45);
+      /* 奖级标签 */
       --pz1-bg:rgba(239,68,68,.16);--pz1-c:#d8392f; --pz2-bg:rgba(249,115,22,.16);--pz2-c:#e07016;
       --pz3-bg:rgba(245,158,11,.18);--pz3-c:#c98307; --pz4-bg:rgba(139,92,246,.16);--pz4-c:#7c4ddb;
       --pz5-bg:rgba(59,130,246,.16);--pz5-c:#2f63e0; --pz6-bg:rgba(22,177,135,.16);--pz6-c:#159468;
@@ -43,6 +45,7 @@
       --accent:#82a6ff; --accent-soft-bg:rgba(120,150,255,.20);
       --tab-bar-bg:linear-gradient(150deg,rgba(48,52,70,.74),rgba(32,35,50,.54)); --tab-bar-border:rgba(255,255,255,.16);
       --tab-active-bg:linear-gradient(150deg,rgba(120,150,255,.32),rgba(120,150,255,.12));
+      --field-bg:rgba(255,255,255,.06);
       --pz1-bg:rgba(239,68,68,.24);--pz1-c:#ff9a92; --pz2-bg:rgba(249,115,22,.24);--pz2-c:#ffb072;
       --pz3-bg:rgba(245,158,11,.26);--pz3-c:#ffce6b; --pz4-bg:rgba(139,92,246,.26);--pz4-c:#c4abff;
       --pz5-bg:rgba(59,130,246,.26);--pz5-c:#92b6ff; --pz6-bg:rgba(22,177,135,.26);--pz6-c:#5fe0b6;
@@ -64,7 +67,14 @@
     .lt-eyebrow{font-size:13px;font-weight:600;letter-spacing:.4px;color:var(--text-3);margin-bottom:2px;}
     .lt-title{margin:0;font-size:34px;font-weight:800;letter-spacing:-.6px;color:var(--text-1);}
     .lt-sub{font-size:13.5px;color:var(--text-2);margin-top:5px;}
-    /* 结果小球 */
+    .ball{border-radius:50%;display:inline-flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-variant-numeric:tabular-nums;}
+    .red-grad{background:radial-gradient(circle at 34% 28%,#ff9d9d,#ef4444 48%,#c01f1f);}
+    .blue-grad{background:radial-gradient(circle at 34% 28%,#9ec2ff,#3b82f6 48%,#1d4fc0);}
+    .b-red,.b-blue{width:26px;height:26px;font-size:11px;}
+    .b-red{box-shadow:0 3px 7px -1px rgba(220,38,38,.45),inset 0 1px 2px rgba(255,255,255,.5);}
+    .b-blue{box-shadow:0 3px 7px -1px rgba(37,99,235,.45),inset 0 1px 2px rgba(255,255,255,.5);}
+    .plus{color:var(--text-3);font-weight:300;}
+    /* 命中号码：渐变球 + 金圈 */
     .rc{width:26px;height:26px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-weight:700;font-size:11px;color:var(--text-2);background:var(--chip-2);font-variant-numeric:tabular-nums;}
     .rc.rhit{color:#fff;background:radial-gradient(circle at 34% 28%,#ff9d9d,#ef4444 50%,#c8221f);box-shadow:0 0 0 2px rgba(255,196,40,.95),0 2px 6px rgba(220,38,38,.4);}
     .rc.bhit{color:#fff;background:radial-gradient(circle at 34% 28%,#9ec2ff,#3b82f6 50%,#1d4fc0);box-shadow:0 0 0 2px rgba(255,196,40,.95),0 2px 6px rgba(37,99,235,.4);}
@@ -73,12 +83,8 @@
     .prize.p1{background:var(--pz1-bg);color:var(--pz1-c);} .prize.p2{background:var(--pz2-bg);color:var(--pz2-c);}
     .prize.p3{background:var(--pz3-bg);color:var(--pz3-c);} .prize.p4{background:var(--pz4-bg);color:var(--pz4-c);}
     .prize.p5{background:var(--pz5-bg);color:var(--pz5-c);} .prize.p6{background:var(--pz6-bg);color:var(--pz6-c);}
-    .plus{color:var(--text-3);font-weight:300;}
-    .row{display:flex;align-items:center;gap:10px;padding:11px 16px;border-top:none;background-image:linear-gradient(90deg,transparent,var(--hairline) 30%,var(--hairline) 70%,transparent);background-size:100% 1px;background-repeat:no-repeat;background-position:top center;}
-    .row .meta{min-width:64px;}
-    .row .issue{font-size:12.5px;font-weight:700;color:var(--text-strong-2);font-variant-numeric:tabular-nums;}
-    .row .balls{display:flex;align-items:center;gap:3px;flex-wrap:wrap;}
-    .row .result{text-align:right;flex-shrink:0;}
+    .item{padding:12px 18px;}
+    .item + .item{border-top:1px solid var(--hairline);}
     .seg{position:fixed;top:0;left:50%;transform:translateX(-50%);z-index:22;width:calc(100% - 32px);max-width:448px;display:flex;justify-content:flex-end;padding-top:14px;pointer-events:none;}
     .seg-box{pointer-events:auto;display:flex;gap:2px;padding:4px;border-radius:21px;background:var(--tab-bar-bg);backdrop-filter:blur(34px) saturate(185%);-webkit-backdrop-filter:blur(34px) saturate(185%);border:1px solid var(--tab-bar-border);box-shadow:var(--glass-shadow-sm),inset 0 1px 0 var(--glass-hi);}
     .seg-btn{width:34px;height:30px;display:flex;align-items:center;justify-content:center;border:none;background:transparent;color:var(--text-3);border-radius:16px;cursor:pointer;transition:all .2s;}
@@ -87,68 +93,58 @@
     .tabbar .inner{display:flex;align-items:stretch;gap:6px;padding:7px;border-radius:30px;background:var(--tab-bar-bg);backdrop-filter:blur(40px) saturate(190%);-webkit-backdrop-filter:blur(40px) saturate(190%);border:1px solid var(--tab-bar-border);box-shadow:var(--glass-shadow),inset 0 1px 0 var(--glass-hi);}
     .tab{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;flex:1;padding:8px 0 6px;border:none;background:transparent;cursor:pointer;font-size:10.5px;font-weight:600;color:var(--text-3);border-radius:23px;transition:all .25s;text-decoration:none;}
     .tab.on{color:var(--accent);font-weight:700;background:var(--tab-active-bg);box-shadow:inset 0 1px 0 var(--glass-hi);}
-    .pbtn{border:1px solid var(--glass-border);padding:9px 16px;border-radius:20px;background:var(--glass-bg);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);color:var(--text-1);font-size:13px;font-weight:600;cursor:pointer;text-decoration:none;display:inline-block;}
-    .pnow{color:var(--text-2);font-size:13px;font-weight:600;padding:0 6px;}
-    .pager{display:flex;align-items:center;justify-content:center;gap:10px;padding:4px 0 16px;}
-    .back-link{display:inline-flex;align-items:center;gap:4px;color:var(--accent);font-size:13px;font-weight:600;text-decoration:none;margin-bottom:8px;}
+    .pager{display:flex;align-items:center;justify-content:center;gap:10px;padding-bottom:8px;flex-wrap:wrap;}
+    .pbtn{border:1px solid var(--glass-border);padding:9px 16px;border-radius:20px;font-size:13px;font-weight:600;color:var(--text-strong-2);background:var(--field-bg);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);text-decoration:none;}
+    .pnow{font-size:13px;font-weight:700;color:var(--text-strong-2);min-width:54px;text-align:center;font-variant-numeric:tabular-nums;}
     </style>
 </head>
 <body>
 <div class="sc-bg"><b class="r"></b><b class="b"></b><b class="v"></b></div>
 
-<div class="seg">
-    <div class="seg-box">
-        <button class="seg-btn" data-mode="light" onclick="setTheme('light')"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg></button>
-        <button class="seg-btn on" data-mode="auto" onclick="setTheme('auto')"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg></button>
-        <button class="seg-btn" data-mode="dark" onclick="setTheme('dark')"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg></button>
+<div class="seg"><div class="seg-box">
+    <button class="seg-btn" data-mode="light" onclick="setTheme('light')" title="浅色"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.5v2M12 19.5v2M21.5 12h-2M4.5 12h-2M18.4 5.6l-1.4 1.4M7 17l-1.4 1.4M18.4 18.4 17 17M7 7 5.6 5.6"/></svg></button>
+    <button class="seg-btn" data-mode="auto" onclick="setTheme('auto')" title="跟随系统"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.9"><circle cx="12" cy="12" r="8.4"/><path d="M12 3.6a8.4 8.4 0 010 16.8z" fill="currentColor" stroke="none"/></svg></button>
+    <button class="seg-btn" data-mode="dark" onclick="setTheme('dark')" title="深色"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linejoin="round"><path d="M20.5 14.8A8.2 8.2 0 1 1 9.2 3.6 6.6 6.6 0 0 0 20.5 14.8z"/></svg></button>
+</div></div>
+
+<div class="wrap">
+    <div style="padding:64px 4px 18px;">
+        <div class="lt-eyebrow">预测档案</div>
+        <h1 class="lt-title">预测记录</h1>
+        <div class="lt-sub">共 {{ total }} 条{% if total_pages > 1 %} · 第 {{ page }} / {{ total_pages }} 页{% endif %} · 命中号码金圈高亮</div>
     </div>
-</div>
 
-<div class="wrap" style="padding-top:56px;">
-    <a href="/" class="back-link">‹ 返回首页</a>
-    <div class="lt-eyebrow">Prediction History</div>
-    <h1 class="lt-title">预测记录</h1>
-    <div class="lt-sub">共 {{ total }} 条预测</div>
-
-    <div class="glass" style="padding:6px 4px 8px;margin-bottom:16px;">
+    <div class="glass" style="padding:6px 0 10px;margin-bottom:16px;">
         {% for pred in predictions %}
-        <div class="row">
-            <div class="meta"><div class="issue">第{{ pred.issue }}期</div></div>
-            <div style="flex:1;">
-                <div class="balls">
-                    {% for i in range(6) %}
-                    {% set num = pred['red' ~ (i+1)] %}
-                    {% if pred.prize and pred.matched_reds and num|string in pred.matched_reds.split(',') %}
-                    <span class="rc rhit">{{ '%02d' % num }}</span>
-                    {% else %}
-                    <span class="rc">{{ '%02d' % num }}</span>
-                    {% endif %}
-                    {% endfor %}
-                    <span class="plus" style="font-size:11px;margin:0 1px;">+</span>
-                    {% if pred.prize and pred.matched_blue %}
-                    <span class="rc bhit">{{ '%02d' % pred.blue }}</span>
-                    {% else %}
-                    <span class="rc">{{ '%02d' % pred.blue }}</span>
-                    {% endif %}
-                </div>
-            </div>
-            <div class="result">
+        <div class="item">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+                <span style="font-size:12px;font-weight:600;color:var(--text-3);">第 {{ pred.issue }} 期{% if pred.date %} · {{ pred.date }}{% endif %}</span>
                 {% if pred.prize %}
-                    {% if '一等' in pred.prize %}<span class="prize p1">{{ pred.prize }}</span>
-                    {% elif '二等' in pred.prize %}<span class="prize p2">{{ pred.prize }}</span>
-                    {% elif '三等' in pred.prize %}<span class="prize p3">{{ pred.prize }}</span>
-                    {% elif '四等' in pred.prize %}<span class="prize p4">{{ pred.prize }}</span>
-                    {% elif '五等' in pred.prize %}<span class="prize p5">{{ pred.prize }}</span>
+                    {% if pred.prize == '未中奖' %}<span class="prize">{{ pred.prize }}</span>
                     {% elif '六等' in pred.prize %}<span class="prize p6">{{ pred.prize }}</span>
+                    {% elif '五等' in pred.prize %}<span class="prize p5">{{ pred.prize }}</span>
+                    {% elif '四等' in pred.prize %}<span class="prize p4">{{ pred.prize }}</span>
+                    {% elif '三等' in pred.prize %}<span class="prize p3">{{ pred.prize }}</span>
+                    {% elif '二等' in pred.prize %}<span class="prize p2">{{ pred.prize }}</span>
+                    {% elif '一等' in pred.prize %}<span class="prize p1">{{ pred.prize }}</span>
                     {% else %}<span class="prize">{{ pred.prize }}</span>{% endif %}
-                {% else %}
-                    <span class="prize">等待开奖</span>
-                {% endif %}
+                {% else %}<span class="prize">等待开奖</span>{% endif %}
+            </div>
+            <div style="display:flex;align-items:center;gap:4px;flex-wrap:wrap;">
+                {% for i in range(6) %}
+                    {% set num = pred['red' ~ (i+1)] %}
+                    {% if pred.prize and num|string in (pred.matched_reds or '').split(',') %}<span class="rc rhit">{{ '%02d' % num }}</span>
+                    {% else %}<span class="ball red-grad b-red">{{ '%02d' % num }}</span>{% endif %}
+                {% endfor %}
+                <span class="plus" style="font-size:14px;margin:0 2px;">+</span>
+                {% if pred.prize and pred.matched_blue %}<span class="rc bhit">{{ '%02d' % pred.blue }}</span>
+                {% else %}<span class="ball blue-grad b-blue">{{ '%02d' % pred.blue }}</span>{% endif %}
+                {% if pred.prize and pred.prize != '未中奖' %}<span style="font-size:11px;font-weight:600;color:var(--text-3);margin-left:6px;">命中 {{ pred.matched_reds.split(',')|length if pred.matched_reds else 0 }}红{{ pred.matched_blue }}蓝</span>{% endif %}
             </div>
         </div>
         {% endfor %}
         {% if not predictions %}
-        <div style="text-align:center;padding:32px 16px;color:var(--text-3);">暂无预测记录</div>
+        <div style="text-align:center;color:var(--text-3);font-size:13.5px;padding:50px 0;">暂无预测记录</div>
         {% endif %}
     </div>
 
@@ -162,7 +158,7 @@
 </div>
 
 <div class="tabbar"><div class="inner">
-    <a href="/" class="tab on"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-8 9 8"/><path d="M5 9.5V20h14V9.5"/></svg><span>首页</span></a>
+    <a href="/" class="tab"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-8 9 8"/><path d="M5 9.5V20h14V9.5"/></svg><span>首页</span></a>
     <a href="/history" class="tab"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3.2 2"/></svg><span>历史</span></a>
     <a href="/my-picks" class="tab"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="8" r="2.3"/><circle cx="16" cy="8" r="2.3"/><circle cx="8" cy="16" r="2.3"/><circle cx="16" cy="16" r="2.3"/></svg><span>自选</span></a>
 </div></div>

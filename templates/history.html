@@ -65,7 +65,8 @@
     .b-red{box-shadow:0 3px 7px -1px rgba(220,38,38,.45),inset 0 1px 2px rgba(255,255,255,.5);}
     .b-blue{box-shadow:0 3px 7px -1px rgba(37,99,235,.45),inset 0 1px 2px rgba(255,255,255,.5);}
     .plus{color:var(--text-3);font-weight:300;}
-    .row{display:flex;align-items:center;gap:10px;padding:11px 16px;border-top:none;background-image:linear-gradient(90deg,transparent,var(--hairline) 30%,var(--hairline) 70%,transparent);background-size:100% 1px;background-repeat:no-repeat;background-position:top center;}
+    .row{display:flex;align-items:center;gap:10px;padding:11px 16px;}
+    .row + .row{border-top:1px solid var(--hairline);}
     .row .meta{min-width:58px;}
     .row .issue{font-size:12.5px;font-weight:700;color:var(--text-strong-2);font-variant-numeric:tabular-nums;}
     .row .date{font-size:10px;color:var(--text-3);margin-top:1px;}
