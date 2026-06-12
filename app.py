@@ -1,4 +1,5 @@
 import json
+import datetime
 from flask import Flask, render_template, jsonify, request
 from apscheduler.schedulers.background import BackgroundScheduler
 from database import (
@@ -132,14 +133,18 @@ def scheduled_update():
 
 
 def do_predict():
+    from database import get_latest_issue
+    issue = get_latest_issue()
+    next_issue = str(int(issue) + 1) if issue else ''
+    # 该期已有预测则跳过，预测一旦生成即锁定，重启不重新生成
+    latest_pred = get_latest_prediction()
+    if next_issue and latest_pred and latest_pred['issue'] == next_issue:
+        return None
     result = predict()
     if result:
-        from database import get_latest_issue
-        issue = get_latest_issue()
-        next_issue = str(int(issue) + 1) if issue else ''
         save_prediction(
             issue=next_issue,
-            date='',
+            date=datetime.date.today().isoformat(),
             reds=result['reds'],
             blue=result['blue'],
             analysis=json.dumps(result['analysis'], ensure_ascii=False)

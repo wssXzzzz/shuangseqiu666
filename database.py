@@ -67,6 +67,12 @@ def init_db():
             conn.execute(col)
         except sqlite3.OperationalError:
             pass
+    # 迁移：清理同一期的重复预测（保留最新一条，与首页展示一致），并加唯一索引防止再次重复
+    conn.execute('''
+        DELETE FROM predictions
+        WHERE id NOT IN (SELECT MAX(id) FROM predictions GROUP BY issue)
+    ''')
+    conn.execute('CREATE UNIQUE INDEX IF NOT EXISTS idx_predictions_issue ON predictions(issue)')
     conn.commit()
     conn.close()
 
@@ -149,9 +155,10 @@ def get_result_count():
 
 
 def save_prediction(issue, date, reds, blue, analysis=''):
+    """一期只保留一条预测：该期已有预测时忽略，重启不会重复生成"""
     conn = get_conn()
     conn.execute(
-        '''INSERT INTO predictions
+        '''INSERT OR IGNORE INTO predictions
            (issue, date, red1, red2, red3, red4, red5, red6, blue, analysis)
            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)''',
         (issue, date, *reds, blue, analysis)
